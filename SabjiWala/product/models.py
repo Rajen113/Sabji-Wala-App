@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 class Sabji(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sabjis')
     sabji_name = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=4, decimal_places=2)  # e.g., 99999.99
-    quantity = models.PositiveIntegerField(default=0)  # optional
+    price = models.DecimalField(max_digits=4, decimal_places=2)
+    product_img=models.ImageField(blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
