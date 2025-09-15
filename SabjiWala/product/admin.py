@@ -5,4 +5,4 @@ from .models import Sabji
 
 @admin.register(Sabji)
 class SabjiAdmin(admin.ModelAdmin):
-    list_display=('sabji_name','price','quantity','created_at')
+    list_display=('sabji_name','price','quantity','product_img','created_at')
