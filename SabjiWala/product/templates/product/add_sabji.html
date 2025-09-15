@@ -1,0 +1,27 @@
+{% extends 'account/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Add Sabji</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.sabji_name.errors }}
+        {{ form.sabji_name }}
+
+        {{ form.price.errors }}
+        {{ form.price }}
+
+        {{ form.quantity.errors }}
+        {{ form.quantity }}
+
+        <button type="submit" class="btn btn-success mt-3">Add Sabji</button>
+    </form>
+</div>
+{% endblock content %}

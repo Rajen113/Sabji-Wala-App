@@ -1,0 +1,61 @@
+<h2>Seller Registration</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <!-- Live Selfie Section -->
+    <label>Live Selfie:</label><br>
+    <button type="button" id="openCamera">📷 Open Camera</button><br><br>
+
+    <video id="video" width="300" height="200" autoplay style="display:none;"></video><br>
+    <button type="button" id="capture" style="display:none;">📸 Capture Selfie</button><br>
+    <canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
+
+    <!-- Hidden input for Base64 image -->
+    <input type="hidden" name="live_selfie" id="live_selfie_input">
+
+    <br><button type="submit">Register</button>
+</form>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('capture');
+    const openCameraBtn = document.getElementById('openCamera');
+    const liveSelfieInput = document.getElementById('live_selfie_input');
+
+    let stream = null;
+
+    // Open camera when button clicked
+    openCameraBtn.addEventListener('click', async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            video.style.display = "block";
+            captureBtn.style.display = "inline-block";
+        } catch (err) {
+            alert("Camera access denied: " + err);
+        }
+    });
+
+    // Capture selfie
+    captureBtn.addEventListener('click', () => {
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Stop the camera after capturing
+        stream.getTracks().forEach(track => track.stop());
+
+        // Hide video and show captured photo
+        video.style.display = "none";
+        captureBtn.style.display = "none";
+        canvas.style.display = "block";
+
+        // Convert to Base64 and store in hidden input
+        const imageData = canvas.toDataURL('image/png');
+        liveSelfieInput.value = imageData;
+
+        alert("Selfie captured successfully!");
+    });
+</script>
