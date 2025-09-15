@@ -38,13 +38,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # Customer-specific
     age = models.PositiveIntegerField(null=True, blank=True)
 
-    # Seller-specific
+    # Seller
     government_id = models.FileField(upload_to='documents/', null=True, blank=True)
     profile_photo = models.ImageField(upload_to='seller_photos/', null=True, blank=True)
     live_selfie = models.ImageField(upload_to='seller_selfies/', null=True, blank=True)
     is_verified = models.BooleanField(default=False)
 
-    # Extra fields
+
+
     email_verified = models.BooleanField(default=False)
 
     objects = CustomUserManager()
