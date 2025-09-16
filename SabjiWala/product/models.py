@@ -13,6 +13,7 @@ class Sabji(models.Model):
     quantity = models.PositiveIntegerField(default=0)
     product_img = models.ImageField(upload_to="sabji_images/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.sabji_name} - {self.user.username} - ₹{self.price}"
