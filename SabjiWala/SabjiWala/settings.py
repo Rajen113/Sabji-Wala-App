@@ -75,23 +75,23 @@ WSGI_APPLICATION = 'SabjiWala.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'SabjiWala',   # dbname
-        'USER': 'postgres.hkrakvnipcpcoccdxzqk',
-        'PASSWORD': 'Rajen@1234',   # jo tumhe Supabase ne diya
-        'HOST': 'aws-1-us-east-2.pooler.supabase.com',
-        'PORT': '6543',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'SabjiWala',   # dbname
+#         'USER': 'postgres.hkrakvnipcpcoccdxzqk',
+#         'PASSWORD': 'Rajen@1234',   # jo tumhe Supabase ne diya
+#         'HOST': 'aws-1-us-east-2.pooler.supabase.com',
+#         'PORT': '6543',
+#     }
+# }
 
 
 

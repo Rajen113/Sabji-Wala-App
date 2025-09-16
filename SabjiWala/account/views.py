@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from .forms import CustomerRegistrationForm, SellerRegistrationForm, CustomerLogInForm
+from .forms import CustomerRegistrationForm, SellerRegistrationForm, CustomerLogInForm,LocationForm
 from django.core.mail import send_mail
 from django.conf import settings
+from geopy.geocoders import Nominatim
 
 def home(request):
     return render(request, 'account/base.html')
@@ -64,3 +65,33 @@ def login_view(request):
 def logout_view(request):
     auth_logout(request)
     return redirect('home')
+
+
+def map_view(request):
+    geolocator = Nominatim(user_agent="account")
+
+    form = LocationForm(request.GET or None)
+    start_city = None
+    end_city = None
+    context = {} 
+
+    if form.is_valid():
+        start_city = form.cleaned_data['start_location']
+        end_city = form.cleaned_data['end_location']
+        print("Start:", start_city, " End:", end_city)
+
+        start_location = geolocator.geocode(start_city)
+        end_location = geolocator.geocode(end_city)
+
+        if start_location and end_location:
+            context = {
+                "start": {"lat": start_location.latitude, "lng": start_location.longitude, "name": start_city},
+                "end": {"lat": end_location.latitude, "lng": end_location.longitude, "name": end_city},
+            }
+
+    return render(request, 'account/map.html', {
+        'form': form,
+        'context': context,
+        'start_city': start_city,
+        'end_city': end_city
+    })

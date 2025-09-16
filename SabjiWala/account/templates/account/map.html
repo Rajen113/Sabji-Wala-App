@@ -1,11 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Free Map with Distance</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 500px;
+            width: 80%;
+        }
+    </style>
 </head>
+
 <body>
-    <h2>this is map</h2>
+    <h2>Free Map (Leaflet + OpenStreetMap)</h2>
+    
+    <!-- Form for city input -->
+    <form action="{% url 'map' %}" method="get">
+        {{ form }}
+        <input type="submit" value="Search">
+    </form>
+
+    <!-- Debug -->
+    <p>Start: {{ start_city }} → End: {{ end_city }}</p>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Leaflet Routing Machine -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <script>
+        // Create map centered at India
+        var map = L.map('map').setView([23.2599, 77.4126], 5);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Check if Django passed context data
+        {% if context.start and context.end %}
+        var startLat = {{ context.start.lat }};
+        var startLng = {{ context.start.lng }};
+        var endLat = {{ context.end.lat }};
+        var endLng = {{ context.end.lng }};
+
+        // Add dynamic route
+        var routeControl = L.Routing.control({
+            waypoints: [
+                L.latLng(startLat, startLng),
+                L.latLng(endLat, endLng)
+            ],
+            routeWhileDragging: true
+        }).addTo(map);
+        {% endif %}
+    </script>
 </body>
 </html>

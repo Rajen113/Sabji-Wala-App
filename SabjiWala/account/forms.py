@@ -73,3 +73,7 @@ class SellerRegistrationForm(UserCreationForm):
 class CustomerLogInForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
+    
+class LocationForm(forms.Form):
+    start_location=forms.CharField(max_length=100)
+    end_location=forms.CharField(max_length=100)
