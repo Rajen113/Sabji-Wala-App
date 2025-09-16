@@ -61,7 +61,6 @@ def login_view(request):
     return render(request, 'account/login.html', {'form': form})
 
 
-# Logout view
 def logout_view(request):
     auth_logout(request)
     return redirect('home')
