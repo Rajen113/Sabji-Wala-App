@@ -1,0 +1,23 @@
+{% extends 'account/base.html' %}
+
+{% block content %}
+  <h3>customer dashboard</h3>
+  <script>
+const ws = new WebSocket('ws://' + window.location.host + '/ws/notifications/');
+
+ws.onopen = function() {
+    console.log("✅ WebSocket connected!");
+};
+
+ws.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    console.log("🔔 Notification received:", data);
+    alert(data.title + " → " + data.body);
+};
+
+ws.onclose = function() {
+    console.log("❌ WebSocket closed.");
+};
+</script>
+
+{% endblock content %}

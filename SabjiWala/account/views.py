@@ -53,6 +53,13 @@ def login_view(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 auth_login(request, user)
+                
+                if user.user_type =='customer':
+                    return render(request,'account/customer_dashboard.html')
+                
+                elif user.user_type =='seller':
+                    return render(request,'account/seller_dashboard.html')
+                
                 return redirect('home')
             else:
                 messages.error(request, "Invalid credentials")
@@ -94,3 +101,6 @@ def map_view(request):
         'start_city': start_city,
         'end_city': end_city
     })
+    
+def notification_page(request):
+    return render(request, "account/notificatins.html")
