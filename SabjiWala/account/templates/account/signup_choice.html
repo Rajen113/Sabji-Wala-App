@@ -1,0 +1,18 @@
+{% extends "account/base.html" %}
+{% block title %}Sign Up - SabjiWala{% endblock %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h2 class="mb-4">Create Your Account</h2>
+    <p class="lead">Please choose one option:</p>
+
+    <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="{% url 'register_customer' %}" class="btn btn-success btn-lg shadow">
+            Sign Up as Customer
+        </a>
+        <a href="{% url 'register_seller' %}" class="btn btn-primary btn-lg shadow">
+            Sign Up as Seller
+        </a>
+    </div>
+</div>
+{% endblock %}

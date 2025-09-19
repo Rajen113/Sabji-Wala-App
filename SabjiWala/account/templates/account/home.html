@@ -1,0 +1,58 @@
+{% extends "account/base.html" %}
+
+{% block title %}SabjiWala - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 bg-success text-white text-center">
+    <div class="container">
+        <h1 class="fw-bold">Welcome to SabjiWala</h1>
+        <p class="lead mt-2 mb-3">Fresh vegetables and fruits delivered directly from local sellers to your home.</p>
+        <a href="{% url 'seller_list' %}" class="btn btn-light btn-lg">Find Nearby Sellers 📍</a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold">Why Choose SabjiWala?</h2>
+        <div class="row g-4 text-center">
+
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 p-4">
+                    <img src="https://img.icons8.com/color/96/000000/vegetable.png" class="mb-3" alt="Fresh">
+                    <h5 class="fw-bold">Fresh Products</h5>
+                    <p>Get fresh vegetables and fruits from trusted local sellers every day.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 p-4">
+                    <img src="https://img.icons8.com/color/96/000000/marker.png" class="mb-3" alt="Nearby">
+                    <h5 class="fw-bold">Nearby Sellers</h5>
+                    <p>Locate sellers near you on the map and order directly from them.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 p-4">
+                    <img src="https://img.icons8.com/color/96/000000/seller.png" class="mb-3" alt="Join">
+                    <h5 class="fw-bold">Join as Seller</h5>
+                    <p>Are you a vendor? Join SabjiWala and sell your products to customers nearby.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-light text-center">
+    <div class="container">
+        <h2 class="fw-bold mb-3">Get Started Today!</h2>
+        <p class="mb-4">Whether you are a customer or a seller, SabjiWala makes your experience simple and convenient.</p>
+        <a href="{% url 'signup_choice' %}" class="btn btn-success btn-lg me-2">Sign Up</a>
+        <a href="{% url 'login' %}" class="btn btn-outline-success btn-lg">Login</a>
+    </div>
+</section>
+{% endblock %}

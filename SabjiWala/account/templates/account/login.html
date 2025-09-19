@@ -1,11 +1,52 @@
-{% extends 'account/base.html' %}
+{% extends "account/base.html" %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
+<div class="card shadow-lg mx-auto" style="max-width: 400px;">
+    <div class="card-body p-4">
+        <h4 class="mb-3 text-center text-success">Login</h4>
 
-<form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
+        <form method="post" novalidate>
+            {% csrf_token %}
 
-{% endblock content %}
+            <!-- Non-field errors -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 px-3 small">
+                    {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Fields -->
+            {% for field in form %}
+                <div class="mb-2">
+                    <label class="form-label small mb-1">{{ field.label }}</label>
+                    {{ field }}
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            let input = document.getElementById("id_{{ field.name }}");
+                            if (input) {
+                                input.classList.add("form-control", "form-control-sm");
+                            }
+                        });
+                    </script>
+
+                    {% for error in field.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-success btn-sm w-100 mt-2">Login</button>
+        </form>
+
+        <p class="mt-2 text-center small">
+            Don't have an account? <br>
+            <a href="{% url 'register_customer' %}" class="text-decoration-none">Customer Sign Up</a> | 
+            <a href="{% url 'register_seller' %}" class="text-decoration-none">Seller Sign Up</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,5 +1,10 @@
-{% extends 'account/base.html' %}
+{% extends "account/base.html" %}
+{% block title %}Seller Dashboard{% endblock %}
 
 {% block content %}
-  <h3>Seller dashboard</h3>
-{% endblock content %}
+<h2>Seller Dashboard</h2>
+<p>Welcome, {{ user.full_name }}!</p>
+<a class="btn btn-primary" href="{% url 'profile' %}">My Profile</a>
+<a class="btn btn-secondary" href="{% url 'home' %}">Home</a>
+<a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
+{% endblock %}

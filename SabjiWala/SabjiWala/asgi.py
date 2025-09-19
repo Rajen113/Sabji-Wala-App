@@ -12,8 +12,9 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from django.core.asgi import get_asgi_application
 import account.routing  # Use your app name here
+# Removed import of non-existent SabjiWala.routing and reverted to account.routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SabjiWala.settings')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),

@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-
 class Sabji(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -16,4 +15,12 @@ class Sabji(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.sabji_name} - {self.user.username} - ₹{self.price}"
+        return f"{self.sabji_name} - {self.user.full_name} - ₹{self.price}"
+
+    @property
+    def formatted_price(self):
+        return f"₹{self.price:.2f}"
+
+    @property
+    def seller_name(self):
+        return self.user.full_name

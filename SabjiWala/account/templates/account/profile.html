@@ -1,0 +1,48 @@
+{% extends "account/base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>My Profile</h2>
+
+    <table class="table table-bordered mt-3">
+        <tr>
+            <th>Full Name</th>
+            <td>{{ user.full_name }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ user.email }}</td>
+        </tr>
+        <tr>
+            <th>Phone</th>
+            <td>{{ user.phone }}</td>
+        </tr>
+        <tr>
+            <th>User Type</th>
+            <td>{{ user.user_type|capfirst }}</td>
+        </tr>
+        {% if user.user_type == 'customer' %}
+        <tr>
+            <th>Age</th>
+            <td>{{ user.age }}</td>
+        </tr>
+        {% elif user.user_type == 'seller' %}
+        <tr>
+            <th>Profile Photo</th>
+            <td>
+                {% if user.profile_photo %}
+                    <img src="{{ user.profile_photo.url }}" alt="Profile Photo" width="100">
+                {% else %}
+                    No photo uploaded
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+
+    <!-- Edit Profile Button -->
+    <a href="{% url 'edit_profile' %}" class="btn btn-primary mt-3">Edit Profile</a>
+</div>
+{% endblock %}

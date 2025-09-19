@@ -1,23 +1,40 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from .forms import CustomerRegistrationForm, SellerRegistrationForm, CustomerLogInForm,LocationForm
+from .forms import CustomerRegistrationForm, SellerRegistrationForm, LoginForm,UserProfileForm
 from django.core.mail import send_mail
 from django.conf import settings
-from geopy.geocoders import Nominatim
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+
+User = get_user_model()
+
 
 def home(request):
-    return render(request, 'account/base.html')
+    return render(request, "account/home.html")
+
+def about(request):
+    return render(request, 'account/about.html')
+
+def contact(request):
+    if request.method == 'POST':
+        # Handle contact form submission (optional)
+        messages.success(request, "Thank you for contacting us!")
+        return redirect('contact')
+    return render(request, 'account/contact.html')
+
+
+def signup_choice(request):
+    return render(request, "account/signup_choice.html")
 
 
 def register_customer(request):
     if request.method == 'POST':
         form = CustomerRegistrationForm(request.POST)
         if form.is_valid():
-            user=form.save()
-            
+            user = form.save()
+
             # Send welcome email
-            
             subject = 'Welcome to SabjiWala App'
             message = f'Hi {user.full_name},\n\nThank you for registering at SabjiWala App!'
             from_email = settings.EMAIL_HOST_USER or 'noreply@sabjiwala.com'
@@ -46,25 +63,25 @@ def register_seller(request):
 
 def login_view(request):
     if request.method == 'POST':
-        form = CustomerLogInForm(request.POST)
+        form = LoginForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 auth_login(request, user)
-                
-                if user.user_type =='customer':
-                    return render(request,'account/customer_dashboard.html')
-                
-                elif user.user_type =='seller':
-                    return render(request,'account/seller_dashboard.html')
-                
+
+                if user.user_type == 'customer':
+                    return redirect('customer_dashboard')   # clean redirect
+
+                elif user.user_type == 'seller':
+                    return redirect('seller_dashboard')     # clean redirect
+
                 return redirect('home')
             else:
                 messages.error(request, "Invalid credentials")
     else:
-        form = CustomerLogInForm()
+        form = LoginForm()
     return render(request, 'account/login.html', {'form': form})
 
 
@@ -72,35 +89,28 @@ def logout_view(request):
     auth_logout(request)
     return redirect('home')
 
+def customer_dashboard(request):
+    return render(request, 'account/customer_dashboard.html')
 
-def map_view(request):
-    geolocator = Nominatim(user_agent="account")
+def seller_dashboard(request):
+    return render(request, 'account/seller_dashboard.html')
 
-    form = LocationForm(request.GET or None)
-    start_city = None
-    end_city = None
-    context = {} 
 
-    if form.is_valid():
-        start_city = form.cleaned_data['start_location']
-        end_city = form.cleaned_data['end_location']
-        print("Start:", start_city, " End:", end_city)
+@login_required
+def user_profile(request):
+    user = request.user
+    return render(request, "account/profile.html", {"user": user})
 
-        start_location = geolocator.geocode(start_city)
-        end_location = geolocator.geocode(end_city)
-
-        if start_location and end_location:
-            context = {
-                "start": {"lat": start_location.latitude, "lng": start_location.longitude, "name": start_city},
-                "end": {"lat": end_location.latitude, "lng": end_location.longitude, "name": end_city},
-            }
-
-    return render(request, 'account/map.html', {
-        'form': form,
-        'context': context,
-        'start_city': start_city,
-        'end_city': end_city
-    })
+@login_required
+def edit_profile(request):
+    user = request.user
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=user)
     
-def notification_page(request):
-    return render(request, "account/notificatins.html")
+    return render(request, 'account/edit_profile.html', {'form': form})

@@ -1,0 +1,31 @@
+{% extends 'account/base.html' %}
+
+{% block title %}Sellers - SabjiWala{% endblock %}
+
+{% block content %}
+<h2>Available Sellers</h2>
+
+<div class="row">
+    {% for seller in sellers %}
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            {% if seller.profile_photo %}
+                <img src="{{ seller.profile_photo.url }}" class="card-img-top" alt="{{ seller.full_name }}">
+            {% else %}
+                <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="No Image">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ seller.full_name }}</h5>
+                <p class="card-text">Email: {{ seller.email }}</p>
+                <p class="card-text">Phone: {{ seller.phone }}</p>
+                <!-- Correct URL for customer to view this seller's products -->
+                <a href="{% url 'seller_products' seller.id %}" class="btn btn-primary">View Products</a>
+
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>No sellers available at the moment.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -70,10 +70,17 @@ class SellerRegistrationForm(UserCreationForm):
 
 
 
-class CustomerLogInForm(forms.Form):
+class LoginForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
     
-class LocationForm(forms.Form):
-    start_location=forms.CharField(max_length=100)
-    end_location=forms.CharField(max_length=100)
+    
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['full_name', 'phone', 'age', 'profile_photo']
+        widgets = {
+            'full_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'age': forms.NumberInput(attrs={'class': 'form-control'}),
+        }

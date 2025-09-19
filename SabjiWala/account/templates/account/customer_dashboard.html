@@ -1,23 +1,73 @@
 {% extends 'account/base.html' %}
 
 {% block content %}
-  <h3>customer dashboard</h3>
-  <script>
-const ws = new WebSocket('ws://' + window.location.host + '/ws/notifications/');
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Customer Dashboard</h2>
 
-ws.onopen = function() {
-    console.log("✅ WebSocket connected!");
-};
+    <!-- Quick Stats -->
+    <div class="row text-center mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm p-3">
+                <h5>Total Orders</h5>
+                <p class="fs-4 text-primary">{{ total_orders|default:"0" }}</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm p-3">
+                <h5>Cart Items</h5>
+                <p class="fs-4 text-success">{{ cart_items|default:"0" }}</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm p-3">
+                <h5>Wishlist</h5>
+                <p class="fs-4 text-warning">{{ wishlist_count|default:"0" }}</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm p-3">
+                <h5>Profile</h5>
+                <a href="{% url 'profile' %}" class="btn btn-outline-dark btn-sm mt-2">View</a>
+            </div>
+        </div>
+    </div>
 
-ws.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-    console.log("🔔 Notification received:", data);
-    alert(data.title + " → " + data.body);
-};
-
-ws.onclose = function() {
-    console.log("❌ WebSocket closed.");
-};
-</script>
-
+    <!-- Recent Orders -->
+    <div class="card shadow p-4">
+        <h4 class="mb-3">Recent Orders</h4>
+        {% if recent_orders %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ order.item_name }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>₹{{ order.total_price }}</td>
+                        <td>
+                            <span class="badge bg-{{ order.status|yesno:'success,danger,secondary' }}">
+                                {{ order.status }}
+                            </span>
+                        </td>
+                        <td>{{ order.created_at|date:"d M, Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-muted">No recent orders found.</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock content %}
+

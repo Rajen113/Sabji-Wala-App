@@ -1,0 +1,73 @@
+{% extends 'account/base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Sellers Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        .popup-content {
+            text-align: center;
+        }
+        .popup-content img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>All Sellers on Map</h2>
+    <div id="map"></div>
+
+    <script>
+        // Map initialize
+        var map = L.map('map').setView([20.5937, 78.9629], 5);
+
+        // OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Sellers from Django
+        var sellers = [
+            {% for seller in sellers %}
+                {
+                    "name": "{{ seller.full_name }}",
+                    "phone": "{{ seller.phone }}",
+                    "lat": {{ seller.latitude }},
+                    "lng": {{ seller.longitude }},
+                    "photo": "{% if seller.profile_photo %}{{ seller.profile_photo.url }}{% else %}https://via.placeholder.com/60{% endif %}"
+                },
+            {% endfor %}
+        ];
+
+        // Add sellers to map
+        sellers.forEach(function(seller) {
+            var marker = L.marker([seller.lat, seller.lng]).addTo(map);
+            var popupContent = `
+                <div class="popup-content">
+                    <img src="${seller.photo}" alt="Profile">
+                    <b>${seller.name}</b><br/>
+                    📞 ${seller.phone}
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+        });
+
+        // Fit map to sellers
+        var group = new L.featureGroup(sellers.map(s => L.marker([s.lat, s.lng])));
+        map.fitBounds(group.getBounds());
+    </script>
+</body>
+</html>
+
+{% endblock %}

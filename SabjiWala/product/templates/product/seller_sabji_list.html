@@ -1,0 +1,35 @@
+{% extends 'account/base.html' %}
+{% block title %}My Products - SabjiWala{% endblock %}
+{% block content %}
+<h2>My Sabji Products</h2>
+<a href="{% url 'add_sabji' %}" class="btn btn-success mb-3">Add New Product</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sabji in products %}
+        <tr>
+            <td>{{ sabji.sabji_name }}</td>
+            <td>{{ sabji.formatted_price }}</td>
+            <td>{{ sabji.quantity }}</td>
+            <td>
+                {% if sabji.product_img %}
+                    <img src="{{ sabji.product_img.url }}" width="50">
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'update_sabji' sabji.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                <a href="{% url 'delete_sabji' sabji.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,61 +1,51 @@
-<h2>Seller Registration</h2>
+{% extends "account/base.html" %}
+{% block title %}Register Seller{% endblock %}
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
+{% block content %}
+<div class="card shadow-sm mx-auto" style="max-width: 400px;">
+    <div class="card-body p-4">
+        <h4 class="mb-3 text-center text-warning">Seller Registration</h4>
 
-    <!-- Live Selfie Section -->
-    <label>Live Selfie:</label><br>
-    <button type="button" id="openCamera">📷 Open Camera</button><br><br>
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
 
-    <video id="video" width="300" height="200" autoplay style="display:none;"></video><br>
-    <button type="button" id="capture" style="display:none;">📸 Capture Selfie</button><br>
-    <canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
+            <!-- Non-field errors -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 px-3 small">
+                    {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
-    <!-- Hidden input for Base64 image -->
-    <input type="hidden" name="live_selfie" id="live_selfie_input">
+            <!-- Fields -->
+            {% for field in form %}
+                <div class="mb-2">
+                    <label class="form-label small mb-1">{{ field.label }}</label>
+                    {{ field }}
+                    
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            let input = document.getElementById("id_{{ field.name }}");
+                            if (input) {
+                                input.classList.add("form-control", "form-control-sm");
+                            }
+                        });
+                    </script>
 
-    <br><button type="submit">Register</button>
-</form>
+                    {% for error in field.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
 
-<script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const captureBtn = document.getElementById('capture');
-    const openCameraBtn = document.getElementById('openCamera');
-    const liveSelfieInput = document.getElementById('live_selfie_input');
+            <button type="submit" class="btn btn-warning btn-sm w-100 mt-2">Register</button>
+        </form>
 
-    let stream = null;
-
-    // Open camera when button clicked
-    openCameraBtn.addEventListener('click', async () => {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            video.style.display = "block";
-            captureBtn.style.display = "inline-block";
-        } catch (err) {
-            alert("Camera access denied: " + err);
-        }
-    });
-
-    // Capture selfie
-    captureBtn.addEventListener('click', () => {
-        const context = canvas.getContext('2d');
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Stop the camera after capturing
-        stream.getTracks().forEach(track => track.stop());
-
-        // Hide video and show captured photo
-        video.style.display = "none";
-        captureBtn.style.display = "none";
-        canvas.style.display = "block";
-
-        // Convert to Base64 and store in hidden input
-        const imageData = canvas.toDataURL('image/png');
-        liveSelfieInput.value = imageData;
-
-        alert("Selfie captured successfully!");
-    });
-</script>
+        <p class="mt-2 text-center small">
+            Already have an account?
+            <a href="{% url 'login' %}" class="text-decoration-none">Login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

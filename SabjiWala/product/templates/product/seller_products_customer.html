@@ -1,0 +1,47 @@
+{% extends 'account/base.html' %}
+
+{% block title %}{{ seller.full_name }} - Products{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h5 class="mb-3 text-center text-success">
+        Products by {{ seller.full_name }}
+    </h5>
+
+    <div class="row g-3">
+        {% for sabji in products %}
+        <div class="col-sm-6 col-md-3">
+            <div class="card h-100 border-0 rounded-3" 
+                 style="box-shadow: 0 3px 8px rgba(0, 128, 0, 0.25); max-width: 220px; margin: auto;">
+                 
+                {% if sabji.product_img %}
+                    <img src="{{ sabji.product_img.url }}" 
+                         class="card-img-top" 
+                         alt="{{ sabji.sabji_name }}" 
+                         style="height: 120px; object-fit: cover; border-top-left-radius: .5rem; border-top-right-radius: .5rem;">
+                {% else %}
+                    <img src="https://via.placeholder.com/200x120?text=No+Image" 
+                         class="card-img-top" 
+                         alt="No Image" 
+                         style="height: 120px; object-fit: cover; border-top-left-radius: .5rem; border-top-right-radius: .5rem;">
+                {% endif %}
+
+                <div class="card-body p-2 text-center">
+                    <h6 class="card-title text-dark fw-semibold mb-1 small">{{ sabji.sabji_name }}</h6>
+                    <p class="mb-0 text-muted small">
+                        ₹{{ sabji.price }} | {{ sabji.quantity }}
+                    </p>
+                    <button class="btn btn-outline-success btn-sm rounded-pill mt-2 px-2 py-0">
+                        ❤️ Like
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <div class="alert alert-warning small">No products available from this seller.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

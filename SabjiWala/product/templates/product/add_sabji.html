@@ -2,29 +2,47 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Add Sabji</h2>
+    <div class="card shadow p-4">
+        <h2 class="mb-4 text-center">Add Sabji</h2>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.sabji_name.errors }}
-        {{ form.sabji_name }}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
 
-        {{ form.price.errors }}
-        {{ form.price }}
+            <div class="mb-3">
+                <label class="form-label">Sabji Name</label>
+                {{ form.sabji_name }}
+                <div class="text-danger">{{ form.sabji_name.errors }}</div>
+            </div>
 
-        {{ form.quantity.errors }}
-        {{ form.quantity }}
+            <div class="mb-3">
+                <label class="form-label">Price</label>
+                {{ form.price }}
+                <div class="text-danger">{{ form.price.errors }}</div>
+            </div>
 
-        {{ form.product_img.errors }}
-        {{ form.product_img }}
+            <div class="mb-3">
+                <label class="form-label">Quantity</label>
+                {{ form.quantity }}
+                <div class="text-danger">{{ form.quantity.errors }}</div>
+            </div>
 
-        <button type="submit" class="btn btn-success mt-3">Add Sabji</button>
-    </form>
+            <div class="mb-3">
+                <label class="form-label">Product Image</label>
+                {{ form.product_img }}
+                <div class="text-danger">{{ form.product_img.errors }}</div>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Add Sabji</button>
+        </form>
+    </div>
 </div>
 {% endblock content %}

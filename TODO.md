@@ -1,0 +1,4 @@
+- [ ] Fix group name mismatch in utils.py
+- [ ] Correct settings module in asgi.py
+- [ ] Check Redis status
+- [ ] Test WebSocket connection
