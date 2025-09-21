@@ -36,6 +36,7 @@
 <body class="d-flex flex-column min-vh-100">
 
     <!-- Navbar -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-custom navbar-dark shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{% url 'home' %}">SabjiWala</a>
@@ -60,13 +61,23 @@
                             href="{% url 'contact' %}">Contact</a>
                     </li>
 
-
-
                     {% if user.is_authenticated %}
+
+                    <!-- Dynamic Map Link -->
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'map' %}active{% endif %}"
-                            href="{% url 'nearby_sellers_map' %}">map</a>
+                        {% if user.user_type == 'customer' %}
+                        <a class="nav-link {% if request.resolver_match.url_name == 'nearby_sellers_map' %}active{% endif %}"
+                            href="{% url 'nearby_sellers_map' %}">
+                            Customer Map
+                        </a>
+                        {% elif user.user_type == 'seller' %}
+                        <a class="nav-link {% if request.resolver_match.url_name == 'seller_dashboard_map' %}active{% endif %}"
+                            href="{% url 'seller_dashboard_map' %}">
+                            Seller Map
+                        </a>
+                        {% endif %}
                     </li>
+
                     {% if user.user_type == 'customer' %}
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'seller_list' %}active{% endif %}"
@@ -79,6 +90,7 @@
                     </li>
                     {% endif %}
 
+                    <!-- Profile Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown"
                             role="button" data-bs-toggle="dropdown">
@@ -96,6 +108,7 @@
                             <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a></li>
                         </ul>
                     </li>
+
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}"
@@ -111,6 +124,7 @@
             </div>
         </div>
     </nav>
+
 
     <!-- Main Content -->
     <main class="flex-grow-1">

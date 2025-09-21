@@ -6,77 +6,66 @@
     <div class="col-md-10">
         <div class="card shadow-sm p-4">
             <h3 class="text-center mb-3">Seller Dashboard Map</h3>
-            <p class="text-center text-muted mb-4">
-                Your location updates automatically. Nearby customers within 1 km are shown.
-            </p>
-
-            <div id="map" style="height:75vh; width:100%; border-radius:10px; border:2px solid #ccc;"></div>
+            <p class="text-center text-muted mb-4">Customers who requested sabji within 1 km</p>
+            <div id="map" style="height:75vh;width:100%;border-radius:10px;border:2px solid #ccc"></div>
         </div>
     </div>
 </div>
 
-<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
+<style>
+.popup-content { text-align:center; }
+.popup-content img {
+    width:60px; height:60px; border-radius:50%; object-fit:cover;
+    margin-bottom:5px; border:2px solid #007bff; box-shadow:0 2px 5px rgba(0,0,0,0.3);
+}
+.popup-content b { display:block; font-size:14px; margin-bottom:3px; }
+.popup-content i { font-size:12px; color:#555; }
+</style>
+
 <script>
-var map = L.map('map').setView([20.5937,78.9629], 13);
+var map = L.map('map').setView([20.5937,78.9629],5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// OSM Tiles
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-var sellerMarker = null;
-var deliveryCircle = null;
-var customerMarkers = L.layerGroup().addTo(map);
-
-var icons = {
-    seller: L.icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png', iconSize:[32,32], iconAnchor:[16,32] }),
-    customer: L.icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png', iconSize:[32,32], iconAnchor:[16,32] })
+var sellerMarker=null;
+var customerMarkers=L.layerGroup().addTo(map);
+var icons={
+    seller: L.icon({iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',iconSize:[32,32],iconAnchor:[16,32]}),
+    customer: L.icon({iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png',iconSize:[32,32],iconAnchor:[16,32]})
 };
 
-// Watch seller position
-if (navigator.geolocation){
+if(navigator.geolocation){
     navigator.geolocation.watchPosition(function(pos){
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
+        const lat=pos.coords.latitude;
+        const lng=pos.coords.longitude;
 
-        // Update seller marker
-        if (sellerMarker){ map.removeLayer(sellerMarker); }
-        sellerMarker = L.marker([lat,lng], {icon: icons.seller}).addTo(map).bindPopup("<b>You are here</b>").openPopup();
+        // Seller location
+        if(sellerMarker) map.removeLayer(sellerMarker);
+        sellerMarker=L.marker([lat,lng],{icon:icons.seller}).addTo(map).bindPopup("<b>You are here</b>").openPopup();
+        map.setView([lat,lng],13);
 
-        // Update delivery area circle (1 km)
-        if (deliveryCircle){ map.removeLayer(deliveryCircle); }
-        deliveryCircle = L.circle([lat,lng], {radius: 1000, color:'blue', fillOpacity:0.1}).addTo(map);
-
-        map.setView([lat,lng],14);
-
-        // Send location to server
+        // Update DB
         fetch("{% url 'update_location' %}",{
             method:"POST",
-            headers:{
-                "Content-Type":"application/json",
-                "X-CSRFToken":"{{ csrf_token }}"
-            },
-            body: JSON.stringify({latitude:lat, longitude:lng})
+            headers:{"Content-Type":"application/json","X-CSRFToken":"{{ csrf_token }}"},
+            body:JSON.stringify({latitude:lat,longitude:lng})
         });
 
-        // Fetch nearby customers
+        // Fetch customers
         fetch("{% url 'nearby_customers' %}")
         .then(res=>res.json())
         .then(data=>{
             customerMarkers.clearLayers();
             data.forEach(c=>{
-                L.marker([c.lat,c.lng], {icon: icons.customer})
-                 .bindPopup(`<b>${c.name}</b><br/><a href="tel:${c.phone}">📞 ${c.phone}</a>`)
-                 .addTo(customerMarkers);
+                let req = c.requests.length ? `<i>📝 ${c.requests.join(", ")}</i>` : "";
+                let popup = `<div class="popup-content"><b>${c.name}</b>${req}</div>`;
+                L.marker([c.lat,c.lng], {icon:icons.customer}).bindPopup(popup).addTo(customerMarkers);
             });
         });
 
-    }, function(err){ console.error(err); }, {enableHighAccuracy:true, maximumAge:10000, timeout:5000});
-} else {
-    alert("Geolocation not supported!");
-}
+    }, function(err){console.error(err);},{enableHighAccuracy:true,maximumAge:10000,timeout:5000});
+} else { alert("Geolocation not supported!"); }
 </script>
 {% endblock %}

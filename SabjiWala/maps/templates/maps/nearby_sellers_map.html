@@ -1,156 +1,94 @@
 {% extends "account/base.html" %}
-
 {% block title %}Nearby Sellers{% endblock %}
-
 {% block content %}
 <div class="row">
-    <!-- Sidebar -->
     <div class="col-md-3 mb-3">
         <div class="card shadow-sm p-3">
-            <h5 class="mb-3 text-center">Filter Sellers</h5>
-            <div class="mb-3">
-                <label for="radiusInput" class="form-label">Search Radius (meters)</label>
-                <input type="number" id="radiusInput" class="form-control" value="1000" min="100" max="5000">
-            </div>
-            <div class="mb-3">
-                <button id="update-btn" class="btn btn-primary w-100">📍 Update My Location</button>
-            </div>
+            <h5 class="text-center mb-3">Filter & Request</h5>
+            <input type="number" id="radiusInput" class="form-control mb-2" value="1000" min="100" max="5000">
+            <input type="text" id="vegInput" class="form-control mb-2" placeholder="Enter sabji (e.g. Aalu)">
+            <button id="update-btn" class="btn btn-primary w-100 mb-2">📍 Update My Location</button>
+            <button id="request-sabji" class="btn btn-success w-100">📩 Request Sabji</button>
         </div>
     </div>
-
-    <!-- Map -->
     <div class="col-md-9">
-        <div id="map" style="height:75vh; width:100%; border-radius:10px; border:2px solid #ccc;"></div>
+        <div id="map" style="height:75vh;width:100%;border-radius:10px;border:2px solid #ccc;"></div>
     </div>
 </div>
 
-<!-- Leaflet CSS & JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<!-- MarkerCluster -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
 <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-
-<style>
-.popup-content { text-align:center; }
-.popup-content img {
-    width: 80px; height: 80px;
-    border-radius: 50%; object-fit: cover; margin-bottom:5px;
-    border: 2px solid #007bff; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    transition: transform 0.2s;
-}
-.popup-content img:hover { transform: scale(1.1); }
-.popup-content a { text-decoration:none; color:#007bff; font-weight:500; }
-</style>
 
 <script>
 var map = L.map('map').setView([20.5937,78.9629],5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// OSM Tiles
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-// Marker cluster
 var markers = L.markerClusterGroup();
-var myMarker = null;
-var myCircle = null;
+var myMarker=null, myCircle=null;
 var radius = parseInt(document.getElementById('radiusInput').value) || 1000;
 
 var icons = {
-    seller: L.icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png', iconSize:[32,32], iconAnchor:[16,32] }),
-    customer: L.icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png', iconSize:[32,32], iconAnchor:[16,32] }),
-    self: L.icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png', iconSize:[32,32], iconAnchor:[16,32] })
+    seller: L.icon({ iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png', iconSize:[32,32], iconAnchor:[16,32]}),
+    self: L.icon({ iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png', iconSize:[32,32], iconAnchor:[16,32]})
 };
 
-// Haversine formula to calculate distance between lat/lng in meters
 function distance(lat1, lon1, lat2, lon2){
-    const R = 6371000; // meters
-    const toRad = x => x*Math.PI/180;
-    const dLat = toRad(lat2-lat1);
-    const dLon = toRad(lon2-lon1);
-    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R*c;
+    const R=6371000;
+    const toRad=x=>x*Math.PI/180;
+    const dLat=toRad(lat2-lat1);
+    const dLon=toRad(lon2-lon1);
+    const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+    return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// Update current user location
 function updateLocation(){
     if(navigator.geolocation){
         navigator.geolocation.getCurrentPosition(function(pos){
-            var lat = pos.coords.latitude;
-            var lng = pos.coords.longitude;
-            radius = parseInt(document.getElementById('radiusInput').value) || 1000;
-
-            // Remove previous marker & circle
-            if(myMarker){ map.removeLayer(myMarker); }
-            if(myCircle){ map.removeLayer(myCircle); }
-
-            myMarker = L.marker([lat,lng], {icon: icons.self})
-                .addTo(map)
-                .bindPopup("<b>You are here</b>")
-                .openPopup();
-
-            myCircle = L.circle([lat,lng], {
-                color: '#007bff',
-                fillColor: '#007bff',
-                fillOpacity: 0.2,
-                radius: radius
-            }).addTo(map);
-
+            var lat=pos.coords.latitude;
+            var lng=pos.coords.longitude;
+            radius=parseInt(document.getElementById('radiusInput').value)||1000;
+            if(myMarker) map.removeLayer(myMarker);
+            if(myCircle) map.removeLayer(myCircle);
+            myMarker=L.marker([lat,lng],{icon:icons.self}).addTo(map).bindPopup("<b>You are here</b>");
+            myCircle=L.circle([lat,lng],{color:'#007bff',fillColor:'#007bff',fillOpacity:0.2,radius:radius}).addTo(map);
             map.setView([lat,lng],14);
 
             fetch("{% url 'update_location' %}",{
                 method:"POST",
-                headers:{
-                    "Content-Type":"application/json",
-                    "X-CSRFToken":"{{ csrf_token }}"
-                },
-                body: JSON.stringify({latitude:lat, longitude:lng})
-            }).then(res=>res.json())
-            .then(data=>{ alert(data.status+": "+(data.message||"Location updated")); });
+                headers:{"Content-Type":"application/json","X-CSRFToken":"{{ csrf_token }}"},
+                body:JSON.stringify({latitude:lat,longitude:lng})
+            });
 
-            loadSellers(lat, lng);
+            loadSellers(lat,lng);
         });
-    } else { alert("Geolocation not supported!"); }
+    }
 }
 
-// Load sellers within radius
-function loadSellers(myLat=null, myLng=null){
-    fetch("{% url 'all_sellers' %}")
-    .then(res=>res.json())
-    .then(data=>{
+function loadSellers(myLat=null,myLng=null){
+    fetch("{% url 'all_sellers' %}").then(res=>res.json()).then(data=>{
         markers.clearLayers();
         data.forEach(u=>{
             if(myLat && myLng){
-                let d = distance(myLat, myLng, u.lat, u.lng);
-                if(d>radius) return; // skip if outside radius
+                if(distance(myLat,myLng,u.lat,u.lng)>radius) return;
             }
-            var icon=(u.type=="seller")?icons.seller:icons.customer;
-            var profileUrl=(u.type=="seller")?`/product/sellers/${u.id}/products/`:'#';
-            var popup=`
-                <div class="popup-content">
-                    <a href="${profileUrl}" target="_blank">
-                        <img src="${u.photo||'https://via.placeholder.com/80'}" alt="Profile">
-                    </a>
-                    <b>${u.name}</b><br/>
-                    <a href="tel:${u.phone}">📞 ${u.phone}</a>
-                </div>
-            `;
-            var m=L.marker([u.lat,u.lng], {icon: icon}).bindPopup(popup);
-            markers.addLayer(m);
+            var popup=`<div style="text-align:center"><img src="${u.photo||'https://via.placeholder.com/80'}" style="width:80px;height:80px;border-radius:50%"><br/><b>${u.name}</b><br/><a href="tel:${u.phone}">📞 ${u.phone}</a></div>`;
+            L.marker([u.lat,u.lng],{icon:icons.seller}).bindPopup(popup).addTo(markers);
         });
         map.addLayer(markers);
     });
 }
 
-// Event listeners
-document.getElementById('update-btn').addEventListener('click', updateLocation);
-document.getElementById('radiusInput').addEventListener('change', updateLocation);
+document.getElementById('update-btn').addEventListener('click',updateLocation);
+document.getElementById('request-sabji').addEventListener('click',function(){
+    var veg=document.getElementById('vegInput').value||"Sabji Needed";
+    fetch("{% url 'request_sabji' %}",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","X-CSRFToken":"{{ csrf_token }}"},
+        body:JSON.stringify({vegetable:veg})
+    }).then(res=>res.json()).then(data=>alert(data.message));
+});
 
-// Initial load
 loadSellers();
 </script>
 {% endblock %}
